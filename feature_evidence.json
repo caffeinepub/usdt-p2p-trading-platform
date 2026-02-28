@@ -1,0 +1,75 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-remove-the-kyc-submission-page-kycsubmissionpage-tsx-the-kyc-management-admin-page-kycmanagementpage-tsx-and-the-kyc-status-badge-references-from-the-dashboard-and-navigation-replace-any-kyc-status-display-with-a-simple-level-0-verified-static-badge-remove-the-kyc-nav-link-from-applayout",
+      "featureTitle": "Remove the KYC submission page (KycSubmissionPage.tsx), the KYC Management admin page (KycManagementPage.tsx), and the KYC status badge references from the Dashboard and navigation. Replace any KYC status display with a simple 'Level 0 — Verified' static badge. Remove the KYC nav link from AppLayout.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/KycStatusBadge.tsx",
+        "frontend/src/components/layout/AppLayout.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/DashboardPage.tsx",
+        "frontend/src/pages/KycSubmissionPage.tsx",
+        "frontend/src/pages/admin/KycManagementPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-create-sell-order-page-createsellorderpage-tsx-to-include-three-new-required-form-fields-upi-id-bank-account-number-and-ifsc-code-these-fields-must-be-validated-ifsc-code-format-11-alphanumeric-characters-bank-account-non-empty-upi-id-must-contain-before-the-order-is-submitted",
+      "featureTitle": "Update the Create Sell Order page (CreateSellOrderPage.tsx) to include three new required form fields: UPI ID, Bank Account Number, and IFSC Code. These fields must be validated (IFSC code format: 11 alphanumeric characters, bank account non-empty, UPI ID must contain '@') before the order is submitted.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/CreateSellOrderPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-the-active-order-escrow-flow-display-the-seller-s-payment-details-upi-id-bank-account-number-ifsc-code-to-the-buyer-on-the-order-detail-view-so-the-buyer-can-make-the-inr-transfer-show-these-details-in-a-clearly-labeled-copyable-card-section-styled-with-monospaced-font",
+      "featureTitle": "In the active order / escrow flow, display the seller's payment details (UPI ID, bank account number, IFSC code) to the buyer on the order detail view so the buyer can make the INR transfer. Show these details in a clearly labeled, copyable card section styled with monospaced font.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/DashboardPage.tsx",
+        "frontend/src/pages/OrderDetailPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-14"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Remove Aadhaar/PAN KYC, Add Seller UPI/Bank Details, Auto-Route Profit to Platform Wallet",
+  "requirements": [
+    {
+      "id": "REQ-11",
+      "summary": "Remove KYC submission page, KYC management admin page, and replace KYC status badge with static 'Level 0 — Verified' badge",
+      "acceptanceCriteria": [
+        "KycSubmissionPage is no longer accessible or linked anywhere in the app.",
+        "KycManagementPage is removed from admin navigation.",
+        "Dashboard shows a static 'Level 0' badge instead of dynamic KYC status.",
+        "No PAN or Aadhaar input fields exist anywhere in the frontend."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/KycSubmissionPage.tsx",
+          "operation": "delete",
+          "description": "Remove the KYC submission page that collects PAN and Aadhaar numbers. This page is no longer needed since Level 1 KYC (PAN/Aadhaar) is eliminated."
+        },
+        {
+          "path": "frontend/src/pages/admin/KycManagementPage.tsx",
+          "operation": "delete",
+          "description": "Remove the admin KYC management page that reviews and approves KYC submissions. With only Level 0 remaining, there are no KYC submissions to manage."
+        },
+        {
+          "path": "frontend/src/components/KycStatusBadge.tsx",
+          "operation": "modify",
+          "description": "Replace the dynamic KYC status badge with a static 'Level 0 — Verified' badge. Remove all Level 1, pending, and rejected status displays. The badge should always show Level 0 with a success icon."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Remove the KYC submission page route (/kyc-submission) from the router configuration. Ensure no routes reference the deleted KycSubmissionPage component."
+        },
+        {
+          "path": "frontend/src/components/layout/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Remove the KYC navigation link from the user navigation menu. Remove any references to /kyc-submission in the mobile hamburger menu and desktop navigation."
+        },
+        {
+          "path": "frontend/src/pages/DashboardPage.tsx",
+          "operation": "modify",
+          "description": "Replace the KycStatusBadge component usage with a static 'Level 0 — Verified' display. Remove any conditional logic for KYC status checks. Remove links to the KYC submission page."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Remove or simplify the useCheckKycStatus hook since KYC level is always 0. The hook can return a constant value or be removed if no longer referenced."
+        }
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "summary": "Add UPI ID, Bank Account Number, and IFSC Code fields to Create Sell Order page with validation",
+      "acceptanceCriteria": [
+        "Create Sell Order form contains UPI ID, Bank Account Number, and IFSC Code input fields.",
+        "Form validates UPI ID contains '@', IFSC is 11 characters alphanumeric, and bank account is non-empty.",
+        "Validation errors are shown inline before submission.",
+        "All three fields are passed to the backend createSellOrder call."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/CreateSellOrderPage.tsx",
+          "operation": "modify",
+          "description": "Add three new required form fields: UPI ID (text input), Bank Account Number (text input), and IFSC Code (text input). Implement inline validation: UPI ID must contain '@', IFSC code must be exactly 11 alphanumeric characters, and bank account number must be non-empty. Display validation errors below each field. Update the form submission handler to pass the payment details (upiId, bankAccountNumber, ifscCode) to the backend createSellOrder function as a PaymentDetails object. Use the authorization component to ensure only authenticated users can access this page."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update the useCreateSellOrder mutation hook to accept PaymentDetails (upiId, bankAccountNumber, ifscCode) as part of the mutation variables. Ensure the hook calls actor.createSellOrder with amountUsdt, exchangeRate, and the new paymentDetails parameter. Add proper error handling for validation failures returned by the backend."
+        }
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "summary": "Display seller payment details (UPI ID, bank account, IFSC) to matched buyers in active order view",
+      "acceptanceCriteria": [
+        "Buyer's active order detail view shows a 'Seller Payment Details' card with UPI ID, Bank Account Number, and IFSC Code.",
+        "Each value has a copy-to-clipboard button.",
+        "Details are displayed in monospaced font consistent with the platform's design system.",
+        "The card is only shown when the order is in an active/matched state, not after completion."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/OrderDetailPage.tsx",
+          "operation": "create",
+          "description": "Create a new order detail page component that displays full order information for buyers and sellers. For buyers viewing active orders, show a 'Seller Payment Details' card containing the seller's UPI ID, Bank Account Number, and IFSC Code. Use monospaced font (font-mono class) for the values. Add a copy-to-clipboard button next to each field using a button with a clipboard icon. Only display the payment details card when the order status is active/matched (not completed or cancelled). Fetch order details using a new backend query function (to be added to useQueries). Use the authorization component to ensure only the matched buyer or admin can view payment details."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a useGetOrderDetails query hook that fetches full order information including seller payment details (upiId, bankAccountNumber, ifscCode) for a given order ID. The hook should call a backend query function that returns order data to the matched buyer. Include proper loading and error states."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add a new route for /orders/:orderId that renders the OrderDetailPage component. Ensure the route is protected by the authentication guard so only logged-in users can access order details."
+        },
+        {
+          "path": "frontend/src/pages/OrderBookPage.tsx",
+          "operation": "modify",
+          "description": "Update the order book table to include a 'View Details' link or button for each order that navigates to /orders/:orderId. This allows buyers to navigate to the detailed order view after matching."
+        },
+        {
+          "path": "frontend/src/pages/DashboardPage.tsx",
+          "operation": "modify",
+          "description": "Add a 'My Orders' quick-action card or section that lists the user's active orders with links to /orders/:orderId for each order. This provides an entry point for buyers to view their matched orders and access seller payment details."
+        }
+      ]
+    }
+  ]
+}

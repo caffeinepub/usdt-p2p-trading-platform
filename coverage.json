@@ -1,0 +1,116 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-28T05:26:44.349Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 6,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-10",
+        "summary": "Remove all Aadhaar and PAN KYC fields from the backend data model. KYC Level 1 (PAN + Aadhaar submission) is eliminated entirely. Only Level 0 (no KYC, default) remains. All backend functions, types, and storage related to PAN/Aadhaar submission, Level 1 approval/rejection, and per-user Level 1 trading limits must be removed or simplified to reflect a single-level (Level 0 only) KYC model.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-11",
+        "summary": "Remove the KYC submission page (KycSubmissionPage.tsx), the KYC Management admin page (KycManagementPage.tsx), and the KYC status badge references from the Dashboard and navigation. Replace any KYC status display with a simple 'Level 0 — Verified' static badge. Remove the KYC nav link from AppLayout.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/KycSubmissionPage.tsx",
+          "frontend/src/pages/admin/KycManagementPage.tsx",
+          "frontend/src/components/KycStatusBadge.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/layout/AppLayout.tsx",
+          "frontend/src/pages/DashboardPage.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/KycSubmissionPage.tsx",
+          "frontend/src/pages/admin/KycManagementPage.tsx",
+          "frontend/src/components/KycStatusBadge.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/layout/AppLayout.tsx",
+          "frontend/src/pages/DashboardPage.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Add seller payment details to the sell order data model in the backend. When a seller creates a sell order, they must provide: UPI ID, bank account number, and IFSC code. These fields are stored with the order and must be visible to the matched buyer during an active trade so the buyer knows where to send INR.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-13",
+        "summary": "Update the Create Sell Order page (CreateSellOrderPage.tsx) to include three new required form fields: UPI ID, Bank Account Number, and IFSC Code. These fields must be validated (IFSC code format: 11 alphanumeric characters, bank account non-empty, UPI ID must contain '@') before the order is submitted.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/CreateSellOrderPage.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/CreateSellOrderPage.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-14",
+        "summary": "In the active order / escrow flow, display the seller's payment details (UPI ID, bank account number, IFSC code) to the buyer on the order detail view so the buyer can make the INR transfer. Show these details in a clearly labeled, copyable card section styled with monospaced font.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/OrderDetailPage.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/OrderBookPage.tsx",
+          "frontend/src/pages/DashboardPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/OrderDetailPage.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/DashboardPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-15",
+        "summary": "Update the escrow release logic in the backend: after admin confirms the buyer's INR payment, automatically calculate the platform profit spread, deduct it from the escrowed USDT, credit the net USDT to the buyer's wallet, and route the profit amount to the platform profit wallet. The ledger entry must record: order ID, buyer principal, USDT released to buyer, profit amount, and timestamp.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "build-template/README.md",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/KycStatusBadge.tsx",
+    "frontend/src/components/layout/AppLayout.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/CreateSellOrderPage.tsx",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/KycSubmissionPage.tsx",
+    "frontend/src/pages/OrderDetailPage.tsx",
+    "frontend/src/pages/admin/KycManagementPage.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

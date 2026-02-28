@@ -1,0 +1,50 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-28T05:26:44.346Z",
+  "summary": "The diff implements most of the six requirements. REQ-10 (backend KYC removal), REQ-11 (frontend KYC removal), REQ-12 (backend payment details model), REQ-13 (frontend form with validation), and REQ-14 (buyer payment details card) are substantially implemented. REQ-15 (escrow release profit routing) shows data type definitions (EscrowRelease) in the backend but the actual releaseEscrow function logic with profit deduction, wallet crediting, ledger entry creation, and audit trail is not visible in the diff. Additionally, KycSubmissionPage.tsx and KycManagementPage.tsx appear in the diff summary as modified files rather than removed, and payment detail visibility enforcement for non-matched users is only partially addressed via mock data in OrderDetailPage.",
+  "missing_requirements": [
+    {
+      "id": "REQ-15",
+      "requirement": "Update escrow release logic: deduct profit spread, credit net USDT to buyer wallet, route profit to platform wallet, create ledger entry (orderId, buyerPrincipal, usdtReleasedToBuyer, profitAmount, timestamp), zero escrow balance, create admin audit trail entry.",
+      "reason": "The backend diff shows the EscrowRelease type and escrowReleases map are defined, but the actual releaseEscrow function body implementing profit deduction, wallet updates, ledger entry creation, and audit trail logging is not shown in the truncated backend/main.mo. No evidence the function logic was implemented.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "requirement": "getOrderDetails query must return seller UPI ID, bank account number, and IFSC code to the matched buyer only; payment details must not be exposed to non-matched users or anonymous callers.",
+      "reason": "OrderDetailPage.tsx explicitly uses mock payment details and comments that the backend does not yet expose a getOrderDetails query that returns payment details to the buyer. There is no evidence of a getOrderDetails backend function being implemented or called.",
+      "evidence": [
+        "frontend/src/pages/OrderDetailPage.tsx",
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "backend/migration.mo — a full data migration module for converting legacy KYC profiles containing panNumber and aadhaarNumber to the new simplified KycInfo schema.",
+      "reason": "The build request only asks to remove PAN/Aadhaar fields from the backend model. It does not request a migration module or any data migration utility.",
+      "evidence": [
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.72,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/KycStatusBadge.tsx",
+    "frontend/src/components/layout/AppLayout.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/CreateSellOrderPage.tsx",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/KycSubmissionPage.tsx",
+    "frontend/src/pages/OrderDetailPage.tsx",
+    "frontend/src/pages/admin/KycManagementPage.tsx",
+    "project_state.json"
+  ]
+}

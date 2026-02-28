@@ -1,0 +1,141 @@
+{
+  "kind": "build_request",
+  "title": "Remove Aadhaar/PAN KYC, Add Seller UPI/Bank Details, Auto-Route Profit to Platform Wallet",
+  "projectName": "USDT P2P Exchange",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-10",
+      "text": "Remove all Aadhaar and PAN KYC fields from the backend data model. KYC Level 1 (PAN + Aadhaar submission) is eliminated entirely. Only Level 0 (no KYC, default) remains. All backend functions, types, and storage related to PAN/Aadhaar submission, Level 1 approval/rejection, and per-user Level 1 trading limits must be removed or simplified to reflect a single-level (Level 0 only) KYC model.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Aadhar pan kyc model remove karo"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend data types no longer contain panNumber, aadhaarNumber, or any Level 1 KYC fields.",
+        "The submitKyc / updateKyc backend function is removed or replaced with a no-op that simply confirms Level 0 status.",
+        "KYC approval/rejection admin functions related to PAN/Aadhaar are removed.",
+        "All users are treated as Level 0 by default with no upgrade path requiring PAN/Aadhaar."
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Remove the KYC submission page (KycSubmissionPage.tsx), the KYC Management admin page (KycManagementPage.tsx), and the KYC status badge references from the Dashboard and navigation. Replace any KYC status display with a simple 'Level 0 — Verified' static badge. Remove the KYC nav link from AppLayout.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Aadhar pan kyc model remove karo"
+        ]
+      },
+      "acceptanceCriteria": [
+        "KycSubmissionPage is no longer accessible or linked anywhere in the app.",
+        "KycManagementPage is removed from admin navigation.",
+        "Dashboard shows a static 'Level 0' badge instead of dynamic KYC status.",
+        "No PAN or Aadhaar input fields exist anywhere in the frontend."
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Add seller payment details to the sell order data model in the backend. When a seller creates a sell order, they must provide: UPI ID, bank account number, and IFSC code. These fields are stored with the order and must be visible to the matched buyer during an active trade so the buyer knows where to send INR.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Usdt selling ka information upi bank ac ifsc code"
+        ]
+      },
+      "acceptanceCriteria": [
+        "SellOrder record includes fields: upiId (Text), bankAccountNumber (Text), ifscCode (Text).",
+        "createSellOrder backend function requires all three payment detail fields.",
+        "getOrderDetails query returns the seller's UPI ID, bank account number, and IFSC code to the matched buyer.",
+        "Payment details are not exposed to non-matched users or anonymous callers."
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "text": "Update the Create Sell Order page (CreateSellOrderPage.tsx) to include three new required form fields: UPI ID, Bank Account Number, and IFSC Code. These fields must be validated (IFSC code format: 11 alphanumeric characters, bank account non-empty, UPI ID must contain '@') before the order is submitted.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Usdt selling ka information upi bank ac ifsc code"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Create Sell Order form contains UPI ID, Bank Account Number, and IFSC Code input fields.",
+        "Form validates UPI ID contains '@', IFSC is 11 characters alphanumeric, and bank account is non-empty.",
+        "Validation errors are shown inline before submission.",
+        "All three fields are passed to the backend createSellOrder call."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "In the active order / escrow flow, display the seller's payment details (UPI ID, bank account number, IFSC code) to the buyer on the order detail view so the buyer can make the INR transfer. Show these details in a clearly labeled, copyable card section styled with monospaced font.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Buyer ko send ho jaye",
+          "upi bank ac ifsc code"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Buyer's active order detail view shows a 'Seller Payment Details' card with UPI ID, Bank Account Number, and IFSC Code.",
+        "Each value has a copy-to-clipboard button.",
+        "Details are displayed in monospaced font consistent with the platform's design system.",
+        "The card is only shown when the order is in an active/matched state, not after completion."
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Update the escrow release logic in the backend: after admin confirms the buyer's INR payment, automatically calculate the platform profit spread, deduct it from the escrowed USDT, credit the net USDT to the buyer's wallet, and route the profit amount to the platform profit wallet. The ledger entry must record: order ID, buyer principal, USDT released to buyer, profit amount, and timestamp.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Buyer ko send ho jaye baki profit mera wallet me ho jaye"
+        ]
+      },
+      "acceptanceCriteria": [
+        "releaseEscrow (or equivalent) function deducts profit spread from total escrowed USDT.",
+        "Net USDT (total minus profit) is credited to buyer's wallet balance.",
+        "Profit amount is added to the platform profit wallet balance.",
+        "A ledger entry is created recording orderId, buyerPrincipal, usdtReleasedToBuyer, profitAmount, and timestamp.",
+        "Escrow balance is zeroed for the completed order.",
+        "Admin audit trail entry is created for the release action."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not remove Level 0 KYC — only Level 1 (PAN/Aadhaar) is removed.",
+    "Seller payment details (UPI/bank/IFSC) must only be visible to the matched buyer, not publicly.",
+    "All escrow and profit routing must remain within the single Motoko actor; no external calls.",
+    "Immutable frontend paths (useInternetIdentity.ts, useActor.ts, main.tsx, components/ui) must not be modified."
+  ],
+  "nonGoals": [
+    "Actual UPI or bank transfer integration — INR payment is recorded as a claim only.",
+    "Adding new KYC levels or any identity verification beyond Level 0.",
+    "Changing the dispute or freeze system logic.",
+    "Modifying the admin profit dashboard metrics or CSV export."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

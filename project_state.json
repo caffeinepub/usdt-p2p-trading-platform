@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Building a USDT P2P trading platform with full-stack Node.js/Express backend, React/Next.js frontend, and PostgreSQL database. Core features include user authentication with OTP and 2FA, KYC levels (Level 0 only, Aadhaar/PAN KYC removed), a USDT wallet system supporting TRC20 and BEP20 networks with escrow logic, a FIFO-based order matching engine for buy/sell orders, seller provides UPI/bank account/IFSC details for INR payment, buyer receives USDT after payment and platform profit goes to platform wallet, an admin profit dashboard with CSV/Excel export, and a dispute/freeze system with full audit trail. Admin roles include Admin, Support, and Finance. Security includes RBAC, JWT, AES-256 key encryption, and rate limiting.",
+  "architectural_notes": [
+    "Backend: Node.js/Express; Frontend: React/Next.js; Database: PostgreSQL; Hosting: Linux VPS with Nginx",
+    "Blockchain integration: TronWeb for TRC20 (mandatory), Web3.js for BEP20 (optional); deposit monitoring via background jobs",
+    "Wallet private keys AES-256-GCM encrypted at rest, signing server-side only, never sent to frontend",
+    "JWT access tokens (15min) + HttpOnly refresh tokens (7d); TOTP 2FA; OTP expiry 5min with max 3 attempts",
+    "Escrow fund flow is atomic DB transaction: lock on sell order, release to buyer + profit to platform wallet on admin confirmation",
+    "FIFO matching engine with partial fill support; platform sets fixed USDT/INR rate and profit spread percentage",
+    "All admin actions logged in audit_logs table with actor_id, IP, user_agent, and JSONB metadata",
+    "Seller UPI/bank account/IFSC stored per sell order; used for buyer INR payment reference; no direct bank integration"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-user-registration-and-authentication-system-with-username-email-password-hashed-optional-2fa-totp-based-account-lockout-after-repeated-failed-attempts-and-session-management-via-tokens-stored-in-the-backend",
+      "title": "Implement user registration and authentication system with username/email, password (hashed), optional 2FA (TOTP-based), account lockout after repeated failed attempts, and session management via tokens stored in the backend.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-kyc-system-with-two-levels-level-0-no-kyc-limited-trading-volume-and-level-1-pan-aadhaar-details-submitted-higher-limits-users-submit-kyc-data-and-admins-can-approve-reject-or-suspend-kyc-status-per-user-trading-limits-are-stored-and-enforced-based-on-kyc-level",
+      "title": "Implement a KYC system with two levels: Level 0 (no KYC, limited trading volume) and Level 1 (PAN + Aadhaar details submitted, higher limits). Users submit KYC data and admins can approve, reject, or suspend KYC status. Per-user trading limits are stored and enforced based on KYC level.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-usdt-wallet-system-where-each-user-has-a-unique-simulated-deposit-address-a-user-wallet-balance-an-escrow-wallet-balance-and-the-platform-maintains-a-profit-wallet-deposits-update-balances-after-a-simulated-confirmation-step-withdrawals-require-admin-approval-before-balance-is-deducted-wallet-types-user-wallet-escrow-wallet-platform-profit-wallet-note-actual-trc20-bep20-blockchain-connectivity-is-not-available-simulate-blockchain-address-generation-and-balance-updates-in-the-backend",
+      "title": "Implement a USDT wallet system where each user has a unique simulated deposit address, a user wallet balance, an escrow wallet balance, and the platform maintains a profit wallet. Deposits update balances after a simulated confirmation step. Withdrawals require admin approval before balance is deducted. Wallet types: User Wallet, Escrow Wallet, Platform Profit Wallet. Note: actual TRC20/BEP20 blockchain connectivity is not available; simulate blockchain address generation and balance updates in the backend.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-fifo-order-book-engine-for-buy-and-sell-orders-sellers-create-sell-orders-specifying-usdt-amount-minimum-and-maximum-inr-range-and-network-trc20-bep20-label-only-buyers-see-a-fixed-platform-inr-usdt-rate-configurable-by-admin-e-g-105-usdt-order-matching-follows-fifo-logic-with-partial-fill-support-no-direct-buyer-to-seller-transfer-is-allowed-all-flows-go-through-escrow",
+      "title": "Implement a FIFO order book engine for buy and sell orders. Sellers create sell orders specifying USDT amount, minimum and maximum INR range, and network (TRC20/BEP20 label only). Buyers see a fixed platform INR/USDT rate (configurable by admin, e.g. ₹105/USDT). Order matching follows FIFO logic with partial fill support. No direct buyer-to-seller transfer is allowed; all flows go through escrow.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-escrow-logic-when-a-seller-places-a-sell-order-the-usdt-amount-is-locked-from-their-wallet-into-the-escrow-wallet-when-a-buyer-places-an-order-and-pays-inr-recorded-as-buyer-s-payment-claim-an-admin-or-finance-role-verifies-the-inr-payment-and-triggers-usdt-release-to-the-buyer-the-platform-automatically-deducts-the-profit-spread-and-routes-it-to-the-platform-profit-wallet-inr-release-to-seller-is-recorded-as-a-ledger-entry-no-actual-bank-integration",
+      "title": "Implement escrow logic: when a seller places a sell order, the USDT amount is locked from their wallet into the escrow wallet. When a buyer places an order and pays INR (recorded as buyer's payment claim), an admin or finance role verifies the INR payment and triggers USDT release to the buyer. The platform automatically deducts the profit spread and routes it to the platform profit wallet. INR release to seller is recorded as a ledger entry (no actual bank integration).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-admin-profit-dashboard-displaying-real-time-metrics-total-usdt-traded-total-inr-volume-profit-per-order-and-daily-weekly-monthly-profit-summaries-include-filters-by-date-range-user-and-network-label-provide-data-export-as-csv",
+      "title": "Build an admin profit dashboard displaying real-time metrics: total USDT traded, total INR volume, profit per order, and daily/weekly/monthly profit summaries. Include filters by date range, user, and network label. Provide data export as CSV.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-dispute-and-freeze-system-buyers-and-sellers-can-raise-a-dispute-on-an-active-order-admins-can-freeze-an-order-halting-any-state-transitions-freeze-a-user-s-wallet-blocking-deposits-withdrawals-manually-release-usdt-to-either-party-or-issue-a-refund-back-to-the-seller-s-wallet-every-admin-action-is-recorded-in-a-full-audit-trail-including-timestamp-and-admin-identity",
+      "title": "Implement a dispute and freeze system. Buyers and sellers can raise a dispute on an active order. Admins can freeze an order (halting any state transitions), freeze a user's wallet (blocking deposits/withdrawals), manually release USDT to either party, or issue a refund back to the seller's wallet. Every admin action is recorded in a full audit trail including timestamp and admin identity.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-role-based-access-control-with-three-roles-admin-full-access-support-view-orders-raise-close-disputes-view-users-and-finance-view-profit-dashboard-approve-withdrawals-export-csv-enforce-withdrawal-rate-limits-per-user-provide-a-manual-override-lock-that-admins-can-toggle-to-pause-all-withdrawal-processing-platform-wide-log-all-user-and-admin-activity-with-timestamps",
+      "title": "Implement role-based access control with three roles: Admin (full access), Support (view orders, raise/close disputes, view users), and Finance (view profit dashboard, approve withdrawals, export CSV). Enforce withdrawal rate limits per user. Provide a manual override lock that admins can toggle to pause all withdrawal processing platform-wide. Log all user and admin activity with timestamps.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-a-cohesive-professional-visual-theme-for-the-platform-use-a-dark-financial-trading-aesthetic-with-deep-charcoal-and-slate-backgrounds-amber-gold-accent-colors-for-actions-and-highlights-clean-monospaced-typography-for-numbers-and-wallet-addresses-and-a-structured-dashboard-layout-with-card-based-ui-components-apply-this-theme-consistently-across-all-pages-including-the-user-panel-order-book-wallet-admin-dashboard-and-kyc-pages",
+      "title": "Design a cohesive, professional visual theme for the platform. Use a dark financial/trading aesthetic with deep charcoal and slate backgrounds, amber/gold accent colors for actions and highlights, clean monospaced typography for numbers and wallet addresses, and a structured dashboard layout with card-based UI components. Apply this theme consistently across all pages including the user panel, order book, wallet, admin dashboard, and KYC pages.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-kyc-submission-page-kycsubmissionpage-tsx-the-kyc-management-admin-page-kycmanagementpage-tsx-and-the-kyc-status-badge-references-from-the-dashboard-and-navigation-replace-any-kyc-status-display-with-a-simple-level-0-verified-static-badge-remove-the-kyc-nav-link-from-applayout",
+      "title": "Remove the KYC submission page (KycSubmissionPage.tsx), the KYC Management admin page (KycManagementPage.tsx), and the KYC status badge references from the Dashboard and navigation. Replace any KYC status display with a simple 'Level 0 — Verified' static badge. Remove the KYC nav link from AppLayout.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-create-sell-order-page-createsellorderpage-tsx-to-include-three-new-required-form-fields-upi-id-bank-account-number-and-ifsc-code-these-fields-must-be-validated-ifsc-code-format-11-alphanumeric-characters-bank-account-non-empty-upi-id-must-contain-before-the-order-is-submitted",
+      "title": "Update the Create Sell Order page (CreateSellOrderPage.tsx) to include three new required form fields: UPI ID, Bank Account Number, and IFSC Code. These fields must be validated (IFSC code format: 11 alphanumeric characters, bank account non-empty, UPI ID must contain '@') before the order is submitted.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-active-order-escrow-flow-display-the-seller-s-payment-details-upi-id-bank-account-number-ifsc-code-to-the-buyer-on-the-order-detail-view-so-the-buyer-can-make-the-inr-transfer-show-these-details-in-a-clearly-labeled-copyable-card-section-styled-with-monospaced-font",
+      "title": "In the active order / escrow flow, display the seller's payment details (UPI ID, bank account number, IFSC code) to the buyer on the order detail view so the buyer can make the INR transfer. Show these details in a clearly labeled, copyable card section styled with monospaced font.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "User authentication with mobile+email OTP, password, optional 2FA, account lockout",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "USDT wallet system with TRC20/BEP20 support, unique deposit addresses, auto balance update, withdrawal with admin approval, and platform/escrow/profit wallet types",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "FIFO order book engine for buy/sell USDT orders with partial fill support and fixed platform INR rate",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Escrow logic: lock USDT on sell order, release to buyer after admin confirms INR payment, deduct platform profit spread, no direct buyer-seller transfer",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Admin profit dashboard with real-time metrics (USDT/INR volume, profit per order, daily/weekly/monthly), filters, and CSV/Excel export",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Dispute and freeze system: raise disputes, admin freeze order/wallet, manual release/refund, full audit trail with IP, time, and admin action logs",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Role-based access control with Admin, Support, and Finance roles; withdrawal rate limits; manual override lock; activity logs; private keys never exposed to frontend",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Remove Aadhaar/PAN KYC model; KYC Level 1 with PAN+Aadhaar verification is removed, only Level 0 remains",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Seller must provide UPI ID, bank account number, and IFSC code when creating a sell order so buyer can make INR payment directly to seller",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "After buyer confirms INR payment and admin verifies, release USDT to buyer and route platform profit spread to platform profit wallet automatically",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Remove all Aadhaar and PAN KYC fields from the backend data model. KYC Level 1 (PAN + Aadhaar submission) is eliminated entirely. Only Level 0 (no KYC, default) remains. All backend functions, types, and storage related to PAN/Aadhaar submission, Level 1 approval/rejection, and per-user Level 1 trading limits must be removed or simplified to reflect a single-level (Level 0 only) KYC model.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add seller payment details to the sell order data model in the backend. When a seller creates a sell order, they must provide: UPI ID, bank account number, and IFSC code. These fields are stored with the order and must be visible to the matched buyer during an active trade so the buyer knows where to send INR.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Update the escrow release logic in the backend: after admin confirms the buyer's INR payment, automatically calculate the platform profit spread, deduct it from the escrowed USDT, credit the net USDT to the buyer's wallet, and route the profit amount to the platform profit wallet. The ledger entry must record: order ID, buyer principal, USDT released to buyer, profit amount, and timestamp.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "USDT P2P Trading Platform",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

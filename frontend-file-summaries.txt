@@ -1,0 +1,18 @@
+{
+  "frontend/src/App.tsx": "Main router setup — removed KYC submission route (/kyc) and KycManagementPage import, added /orders/$orderId route for OrderDetailPage.",
+  "frontend/src/lib/utils.ts": "Utility file exporting the `cn` helper function that merges Tailwind class names using clsx and tailwind-merge.",
+  "frontend/src/pages/DisputePage.tsx": "User-facing dispute page showing active orders with the ability to raise buyer or seller disputes via the backend raiseDispute mutation.",
+  "frontend/src/pages/CreateSellOrderPage.tsx": "Sell order creation form — added UPI ID, Bank Account Number, and IFSC Code fields with inline validation; wired to useCreateSellOrder mutation that calls the backend with PaymentDetails.",
+  "frontend/src/pages/admin/AdminDashboardPage.tsx": "Admin-only profit dashboard with filterable metrics (USDT traded, INR volume, profit), time/network filters, order profit table, and CSV export functionality.",
+  "frontend/src/pages/admin/KycManagementPage.tsx": "Admin page listing all users with their KYC status and documents, allowing admins to approve or reject Level 1 KYC submissions.",
+  "frontend/src/pages/admin/ApprovalsPage.tsx": "Admin page for managing user approval requests with approve/reject actions using the setApproval backend mutation.",
+  "frontend/src/pages/admin/DisputeManagementPage.tsx": "Admin page for resolving disputed orders with actions to freeze orders, freeze wallets, release USDT to buyers, or issue refunds to sellers.",
+  "frontend/src/pages/admin/AuditLogPage.tsx": "Admin-only audit log page displaying immutable platform action records with search and action-type filtering capabilities.",
+  "frontend/src/pages/admin/RoleManagementPage.tsx": "Admin page for assigning user roles (Admin/User/Guest) with role permission descriptions and per-user role dropdowns.",
+  "frontend/src/pages/admin/WithdrawalLockPage.tsx": "Admin emergency control page with a toggle switch to enable/disable the global withdrawal lock, with status indicator and lock history.",
+  "frontend/src/hooks/useQueries.ts": "All React Query hooks for backend interaction — updated to replace old KYC hooks (useUpdateKyc removed, useCheckKycStatus returns static 0), added useCreateSellOrder mutation that accepts PaymentDetails (upiId, bankAccountNumber, ifscCode).",
+  "frontend/src/components/KycStatusBadge.tsx": "Static \"Level 0 — Verified\" badge component with a success-colored ShieldCheck icon; no longer accepts dynamic KYC level/verified props.",
+  "frontend/src/components/layout/AppLayout.tsx": "App shell with header navigation, user dropdown, and footer — removed KYC nav item from userNavItems and KYC Management from adminNavItems.",
+  "frontend/src/pages/DashboardPage.tsx": "User dashboard — removed KYC link quick-action card and useCheckKycStatus import, replaced with static KycStatusBadge and a Disputes quick-action card.",
+  "frontend/src/pages/OrderDetailPage.tsx": "New order detail page showing order summary and a \"Seller Payment Details\" card (UPI ID, bank account, IFSC) with copy-to-clipboard buttons; card only shown when order is active."
+}
